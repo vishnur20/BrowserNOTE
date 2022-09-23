@@ -1,0 +1,11 @@
+body {
+    background-color: wheat;
+    padding: 10px;
+    margin: 0;
+    min-height: 100px;
+    width: 200px;
+}
+
+textarea {
+    width: 97%;
+}
