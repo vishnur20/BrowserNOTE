@@ -10,7 +10,7 @@ var getNotesFromMem = async () => {
 }
 
 var loadNotes = () => {
-    if(notes.length == 0) {    // savedNotes == undefined || 
+    if(notes.length == 0) {    // notes == undefined || 
         $('#savedNotes').hide();
         $('#noNotesMessage').show();
         return;
@@ -22,11 +22,12 @@ var loadNotes = () => {
     var div_notes = document.createElement('div');
     notes.forEach((note) => {
         var div_note = document.createElement('div');
-        div_note.setAttribute('style', 'border:1px solid black; padding: 5px; margin: 5px 2px; overflow-wrap: break-word');
+        // div_note.setAttribute('style', 'border:2px solid black; padding: 5px; margin: 5px 2px; overflow-wrap: break-word');
         div_note.setAttribute('id', note.id);
+        div_note.setAttribute('class', 'note');
 
         var div_noteMessage = document.createElement('div');
-        div_noteMessage.setAttribute('style', 'font-weight: bold');
+        div_noteMessage.setAttribute('class', 'note-message');
         div_noteMessage.innerText = note.message;
         div_note.append(div_noteMessage);
 
@@ -39,16 +40,24 @@ var loadNotes = () => {
         btn_delete.setAttribute('id', note.id);
         btn_delete.setAttribute('class', 'delete');
         btn_delete.innerText = 'Delete';
-        // btn_delete.setAttribute('onclick', 'delete()');
+        btn_delete.click(() => {
+            this.trigger('deleteNote');
+        });
         div_note.append(btn_delete);
 
         div_notes.append(div_note);
     });
     $('#savedNotes').append(div_notes);
+    $('#svaedNotes').on('deleteNote', deleteNote);
 }
 
 var saveNote = () => {
     var noteMessage = $('#noteMessage').val();
+    if(noteMessage == "") {
+        window.alert('Type something.');
+        return;
+    }
+
     var currNote = {};
     currNote.id = genId();
     currNote.message = noteMessage;
@@ -59,14 +68,13 @@ var saveNote = () => {
     $('#noteMessage').val('');
 }
 
-var deleteNote = () => {
-    console.log(Event.target);
-    var noteId = Event.target.id;
-    notes = notes.forEach(note => {
-        if(note.id != noteId) {
-            return note;
-        }
+var deleteNote = (e) => {
+    var noteId = e.target.parentNode.getAttribute('id');
+    console.log(noteId);
+    var updatedNotes = notes.filter(note => {
+        return note.id != noteId;
     });
+    notes = updatedNotes;
     loadNotes();
     console.log('After deleting a note');
     console.table(notes);
@@ -111,6 +119,6 @@ $(document).ready(async () => {
     loadNotes();
     $('#saveNote').click(saveNote);
     $('#deleteAll').click(deleteAll);
-    $('.delete').click(deleteNote());
+    $('.delete').click(deleteNote);
     getCurrentTime();
 });

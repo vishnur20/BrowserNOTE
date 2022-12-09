@@ -8,4 +8,18 @@ body {
 
 textarea {
     width: 97%;
+    resize: none;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.note {
+    margin: 5px 2px;
+    border: 2px solid black;
+    padding: 5px;
+    overflow-wrap: break-word;
+    font-size: 13px;
+}
+
+.note-message {
+    font-weight: bold;
 }
