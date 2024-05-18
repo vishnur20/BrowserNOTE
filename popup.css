@@ -3,13 +3,23 @@ body {
     padding: 10px;
     margin: 0;
     min-height: 100px;
-    width: 200px;
+    min-width: 250px;
+    max-width: 300px;
+    overflow: scroll;
+    scrollbar-width: thin;
 }
 
-textarea {
+#savedNotes {
+    max-height: inherit;
+}
+
+.txtarea {
     width: 97%;
     resize: none;
     font-family: Arial, Helvetica, sans-serif;
+    border-radius: 5px;
+    scrollbar-width: thin;
+    padding: 5px;
 }
 
 .note {
@@ -18,8 +28,19 @@ textarea {
     padding: 5px;
     overflow-wrap: break-word;
     font-size: 13px;
+    border-radius: 5px;
 }
 
 .note-message {
+    max-height: 100px;
+    overflow: auto;
+    scrollbar-width: thin;
+    padding: 2px;
+}
+
+.delete-btn {
+    cursor: pointer;
     font-weight: bold;
+    color: red;
+    margin-left: 10px;
 }

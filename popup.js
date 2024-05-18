@@ -2,10 +2,14 @@
 var notes = [];
 
 var getNotesFromMem = async () => {
-    return new Promise((resolve) => {
-        chrome.storage.sync.get("browserNOTES", (obj) => {
-            return resolve(obj.browserNOTES);
-        });
+    return new Promise((resolve, reject) => {
+        try {
+            chrome.storage.sync.get("browserNOTES", (obj) => {
+                resolve(obj.browserNOTES);
+            });
+        } catch(err) {
+            reject(err);
+        }
     });
 }
 
@@ -21,32 +25,37 @@ var loadNotes = () => {
     $('#savedNotes').empty();
     var div_notes = $('#savedNotes');
     notes.forEach((note) => {
-        var div_note = document.createElement('div');
-        // div_note.setAttribute('style', 'border:2px solid black; padding: 5px; margin: 5px 2px; overflow-wrap: break-word');
-        div_note.setAttribute('id', note.id);
-        div_note.setAttribute('class', 'note');
-
-        var div_noteMessage = document.createElement('div');
-        div_noteMessage.setAttribute('class', 'note_message');
-        div_noteMessage.innerText = note.message;
-        div_note.append(div_noteMessage);
-
-        var small_date = document.createElement('small');
-        small_date.innerHTML = '<em>' + note.createdTime + '</em>';
-        div_note.append(small_date);
-
-        var btn_delete = document.createElement('button');
-        btn_delete.setAttribute('class', 'delete_btn');
-        btn_delete.innerText = 'Delete';
-        btn_delete.click(() => {
-            deleteNote();
-        });
-        div_note.append(btn_delete);
-        div_notes.append(div_note);
+        div_notes.append(getNoteDiv(note));
     });
 }
 
-var saveNote = () => {
+var getNoteDiv = (note) => {
+    var div_note = document.createElement('div');
+    // div_note.setAttribute('style', 'border:2px solid black; padding: 5px; margin: 5px 2px; overflow-wrap: break-word');
+    div_note.setAttribute('id', note.id);
+    div_note.setAttribute('class', 'note');
+
+    var div_noteMessage = document.createElement('div');
+    div_noteMessage.setAttribute('class', 'note-message');
+    div_noteMessage.innerText = note.message;
+    div_note.append(div_noteMessage);
+
+    var small_date = document.createElement('small');
+    small_date.innerHTML = '<em>' + note.createdTime + '</em>';
+    div_note.append(small_date);
+
+    var a_delete = document.createElement('a');
+    a_delete.setAttribute('class', 'delete-btn');
+    a_delete.innerText = 'Delete';
+    a_delete.click(() => {
+        deleteNote();
+    });
+    small_date.append(a_delete);
+    return div_note;
+}
+
+var saveNote = (e) => {
+    e.stopPropagation();
     var noteMessage = $('#noteMessage').val();
     if(noteMessage == "") {
         window.alert('Type something.');
@@ -57,26 +66,8 @@ var saveNote = () => {
     currNote.id = genId();
     currNote.message = noteMessage;
     currNote.createdTime = getCurrentTime();
-    // notes.push(currNote);    // for inserting at last
     
-    var div_currNote = document.createElement('div');
-    div_currNote.setAttribute('id', currNote.id);
-    div_currNote.setAttribute('class', 'note');
-    var div_noteMessage = document.createElement('div');
-    div_noteMessage.setAttribute('class', 'note_message');
-    var small_date = document.createElement('small');
-    var btn_delete = document.createElement('button');
-    btn_delete.setAttribute('class', 'delete_btn');
-    btn_delete.innerText = 'Delete';
-    btn_delete.click(() => {
-        deleteNote();
-    });
-    small_date.innerHTML = "<em>" + currNote.createdTime + "</em>";
-    div_noteMessage.innerText = currNote.message;
-    div_currNote.append(div_noteMessage);
-    div_currNote.append(small_date);
-    div_currNote.append(btn_delete);
-    $('#savedNotes').prepend(div_currNote);
+    $('#savedNotes').prepend(getNoteDiv(currNote));
     $('#noteMessage').val('');
     
     notes.splice(0, 0, currNote);    // for inserting at indx 0
@@ -89,10 +80,12 @@ var saveNote = () => {
 }
 
 var deleteNote = (e) => {
-    if(e.target.getAttribute('class') != 'delete_btn') {
+    if(e.target.getAttribute('class') != 'delete-btn') {
         return;
     }
-    var noteId = e.target.parentNode.getAttribute('id');
+    var noteId = e.target.parentNode.parentNode.getAttribute('id');
+    //
+    console.log(e.target.parentNode);
     $("#" + noteId).remove();
     var updatedNotes = notes.filter(note => {
         return note.id != noteId;
@@ -138,8 +131,11 @@ var getCurrentTime = () => {
     return ISTTime.toLocaleString(); 
 }
 
+
 $(document).ready(async () => {
     notes = await getNotesFromMem();
+    //
+    console.log(notes);
     loadNotes();
     $('#saveNote').click(saveNote);
     $('#deleteAll').click(deleteAll);
