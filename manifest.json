@@ -1,17 +1,10 @@
 {
-    "manifest_version": 2,
-    "name": "BrowserNOTE",
-    "version": "1.0",
-    "description": "This is a simple NotePad Extension to save notes while browsing.",
-    "browser_action": {
-        "default_icon": "./icon64.png",
-        "default_popup": "./popup.html"
-    },
-    "icons": {
-        "64": "./icon64.png"
-    },
-    "permissions": ["storage"],
-    "background": {
-        "service_worker": "./background.js"
-    }
+    "name": "BrowserNote",
+    "short_name": "BNote",
+    "theme_color": "#2196f3",
+    "background_color": "#2196f3",
+    "display": "standalone",
+    "orientation": "portrait",
+    "scope": "/",
+    "start_url": "/."
 }
